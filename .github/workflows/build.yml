@@ -45,6 +45,8 @@ jobs:
           cp -R build/Build/Products/Release-iphoneos/GuitarChords.app Payload/
           test -f Payload/GuitarChords.app/web/index.html
           test -f Payload/GuitarChords.app/web/js/main.js
+          plutil -p Payload/GuitarChords.app/Info.plist | grep -E "CFBundleIdentifier|CFBundleDisplayName|MinimumOSVersion|UISupportedInterfaceOrientations|CFBundleIconName|UILaunchScreen" -A2
+          ls Payload/GuitarChords.app | grep -E "Assets.car|AppIcon"
           zip -qr GuitarChords.ipa Payload
           ls -l GuitarChords.ipa
       - uses: actions/upload-artifact@v4
