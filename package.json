@@ -1,0 +1,1 @@
+{ "name": "guitar-chords", "private": true, "type": "module", "scripts": { "test": "node --test" } }
