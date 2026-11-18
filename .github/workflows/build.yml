@@ -17,3 +17,38 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: swift --version && swift test --package-path ios/WebShellKit
+
+  ios:
+    needs: [web, swift]
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bundle the web app into the iOS project
+        run: |
+          mkdir -p ios/web
+          cp -R index.html manifest.webmanifest js css icons ios/web/
+      - name: Generate the Xcode project
+        run: |
+          brew install xcodegen
+          cd ios && xcodegen generate
+      - name: Build (unsigned; Sideloadly signs it)
+        run: |
+          xcodebuild -version
+          xcodebuild -project ios/GuitarChords.xcodeproj -scheme GuitarChords -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build > build.log 2>&1 \
+            || { grep -E "error:|warning: .*Swift" build.log | head -40; tail -60 build.log; exit 1; }
+          tail -5 build.log
+      - name: Package GuitarChords.ipa
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/GuitarChords.app Payload/
+          test -f Payload/GuitarChords.app/web/index.html
+          test -f Payload/GuitarChords.app/web/js/main.js
+          zip -qr GuitarChords.ipa Payload
+          ls -l GuitarChords.ipa
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GuitarChords-ipa
+          path: GuitarChords.ipa
+          retention-days: 30

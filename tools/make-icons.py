@@ -11,7 +11,7 @@ def inside_pick(x, y):
     r = 1.6
     return all((x - cx) ** 2 + (y - cy) ** 2 <= r * r for cx, cy in corners) and (x * x + (y + 0.05) ** 2) <= 0.98
 
-def png(size, path):
+def png(size, path, alpha=True):
     rows = []
     ss = 3  # supersampling for smooth edges
     for py in range(size):
@@ -25,15 +25,19 @@ def png(size, path):
                     acc += inside_pick(x / 0.72, y / 0.72)
             a = acc / (ss * ss)
             c = tuple(round(BG[i] * (1 - a) + PICK[i] * a) for i in range(4))
-            row += bytes(c)
+            row += bytes(c if alpha else c[:3])
         rows.append(bytes(row))
     raw = b''.join(rows)
     def chunk(t, d): return struct.pack('>I', len(d)) + t + d + struct.pack('>I', zlib.crc32(t + d) & 0xffffffff)
-    data = b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', size, size, 8, 6, 0, 0, 0)) + chunk(b'IDAT', zlib.compress(raw, 9)) + chunk(b'IEND', b'')
+    data = b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', size, size, 8, 6 if alpha else 2, 0, 0, 0)) + chunk(b'IDAT', zlib.compress(raw, 9)) + chunk(b'IEND', b'')
     with open(path, 'wb') as f: f.write(data)
 
 out = sys.argv[1] if len(sys.argv) > 1 else 'icons'
 os.makedirs(out, exist_ok=True)
 for size, name in [(192, 'icon-192.png'), (512, 'icon-512.png'), (180, 'apple-touch-icon.png'), (32, 'favicon-32.png')]:
     png(size, os.path.join(out, name))
+# iOS app icon: 1024 px, no alpha channel (Apple rejects icons with alpha)
+ios = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'ios', 'App', 'Assets.xcassets', 'AppIcon.appiconset')
+if os.path.isdir(ios):
+    png(1024, os.path.join(ios, 'icon-1024.png'), alpha=False)
 print('icons written')
