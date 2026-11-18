@@ -7,7 +7,7 @@ export const NATURAL_PC = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 export function parsePitch(name) {
   const m = /^([A-G])(#{0,2}|b{0,2})$/.exec(name);
   if (!m) throw new Error(`Bad pitch name: ${name}`);
-  const acc = m[2].startsWith('#') ? m[2].length : -m[2].length;
+  const acc = m[2].startsWith('#') ? m[2].length : m[2] ? -m[2].length : 0;
   return { letter: m[1], acc };
 }
 
