@@ -1,0 +1,14 @@
+# Whitelist: this repo lives in a home directory; only track the project.
+/*
+!/.gitignore
+!/package.json
+!/index.html
+!/manifest.webmanifest
+!/sw.js
+!/vercel.json
+!/js/
+!/css/
+!/icons/
+!/test/
+!/tools/
+!/docs/

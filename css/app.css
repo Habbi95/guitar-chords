@@ -1,0 +1,80 @@
+:root {
+  color-scheme: dark;
+  --bg: #121418; --panel: #1b1e24; --panel2: #252932; --line: #30353f;
+  --fg: #ece9e4; --dim: #9aa0aa; --accent: #f0a63a; --accent-ink: #1a1206; --danger: #ff6b5e;
+  --safe-t: env(safe-area-inset-top); --safe-b: env(safe-area-inset-bottom);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.35 -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+body { padding: 0 max(12px, env(safe-area-inset-right)) calc(24px + var(--safe-b)) max(12px, env(safe-area-inset-left)); overscroll-behavior-y: none; }
+button, select { font: inherit; color: inherit; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+button { min-height: 44px; min-width: 44px; background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; padding: 0 14px; cursor: pointer; }
+button:disabled { opacity: .4; }
+button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+select { min-height: 44px; background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; padding: 0 10px; }
+
+/* header */
+.top { position: sticky; top: 0; z-index: 5; display: flex; gap: 8px; align-items: center; padding: calc(8px + var(--safe-t)) 0 10px; background: var(--bg); border-bottom: 1px solid var(--line); }
+.top .key { flex: 1 1 auto; min-width: 0; font-weight: 600; }
+.tempo { display: flex; align-items: center; gap: 4px; }
+.tempo .nudge { padding: 0; width: 44px; font-size: 22px; }
+.tempo .bpm { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 6px; min-width: 58px; background: none; border: none; line-height: 1.05; }
+.tempo .bpm b { font-size: 20px; font-variant-numeric: tabular-nums; }
+.tempo .bpm small { font-size: 11px; color: var(--dim); }
+.play { width: 56px; height: 56px; border-radius: 50%; padding: 0; font-size: 22px; background: var(--accent); color: var(--accent-ink); border: none; }
+.play.on { background: var(--fg); color: var(--bg); }
+
+/* bars */
+.bars { list-style: none; margin: 12px 0; padding: 0; display: grid; gap: 8px; }
+.bar { display: grid; grid-template-columns: 1fr auto; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 6px; transition: border-color .1s; }
+.bar.playing { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.bar-main { display: grid; grid-template-columns: 28px 1fr auto; grid-template-areas: "num chord grid" "num glyphs glyphs"; align-items: center; gap: 2px 8px; text-align: left; background: none; border: none; padding: 6px 4px; }
+.num { grid-area: num; color: var(--dim); font-variant-numeric: tabular-nums; text-align: center; }
+.chord { grid-area: chord; font-size: 22px; font-weight: 700; letter-spacing: .2px; }
+.grid { grid-area: grid; color: var(--dim); font-size: 13px; }
+.glyphs { grid-area: glyphs; display: flex; gap: 8px; flex-wrap: wrap; font-size: 15px; color: var(--dim); }
+.glyphs .beat { display: inline-flex; gap: 1px; padding: 0 2px; border-left: 1px solid var(--line); }
+.glyphs .beat:first-child { border-left: none; padding-left: 0; }
+.glyphs i { font-style: normal; min-width: .8em; text-align: center; border-radius: 3px; }
+.glyphs i.acc { color: var(--fg); font-weight: 800; }
+.glyphs i.now { background: var(--accent); color: var(--accent-ink); }
+.more { align-self: start; background: none; border: none; font-size: 22px; color: var(--dim); }
+.menu { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.menu button { padding: 0 6px; font-size: 14px; }
+.danger { color: var(--danger); }
+.add { width: 100%; background: none; border-style: dashed; color: var(--dim); }
+.empty { color: var(--dim); text-align: center; padding: 32px 0; }
+
+/* sheet */
+.overlay { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.55); display: flex; align-items: flex-end; }
+.sheet { width: 100%; max-height: 88vh; overflow-y: auto; background: var(--panel); border-radius: 18px 18px 0 0; padding: 12px 12px calc(16px + var(--safe-b)); border-top: 1px solid var(--line); }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 18px; }
+.close { background: none; border: none; font-size: 20px; }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; margin-bottom: 10px; }
+.seg.small button { min-height: 40px; padding: 0 4px; }
+.pane { display: grid; gap: 10px; }
+.grid-btns { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; }
+.grid-btns.roots { grid-template-columns: repeat(6, 1fr); }
+.grid-btns.roots button { padding: 0; }
+.grid-btns .deg { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 4px; min-height: 58px; }
+.grid-btns .deg small { color: var(--dim); font-size: 12px; }
+.grid-btns .deg.on small { color: var(--accent-ink); }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.row > button { flex: 1 1 auto; }
+.source { flex: 1 1 auto; }
+.gridname { color: var(--dim); font-size: 14px; }
+.steps { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; }
+.beatgrp { scroll-snap-align: start; display: grid; gap: 4px; flex: 1 0 auto; }
+.beatgrp small { color: var(--dim); font-size: 12px; }
+.cells { display: flex; gap: 4px; }
+.cell { width: 44px; height: 52px; padding: 0; font-size: 20px; }
+.steps.n8 .cell { width: 100%; min-width: 34px; }
+.steps.n8 .beatgrp { flex: 1 1 0; }
+.cell.rest { color: var(--dim); }
+.cell.mute { color: #7fb6ff; }
+.cell.bass { color: #8fe08f; font-weight: 700; }
+.cell.acc { border: 2px solid var(--accent); font-weight: 900; }
+.hint { color: var(--dim); font-size: 13px; margin: 0; }
+.mine { list-style: none; padding: 0; margin: 0; display: grid; gap: 4px; }
+.mine li { display: flex; justify-content: space-between; align-items: center; background: var(--panel2); border-radius: 10px; padding-left: 12px; }
+.mine button { background: none; border: none; }
