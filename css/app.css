@@ -1,0 +1,4 @@
+:root { color-scheme: dark; --bg: #121418; --fg: #e8e6e3; --accent: #f0a63a; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.4 -apple-system, system-ui, sans-serif; }
+button { font: inherit; color: inherit; touch-action: manipulation; min-height: 44px; min-width: 44px; }
