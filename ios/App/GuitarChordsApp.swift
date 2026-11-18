@@ -18,7 +18,7 @@ struct GuitarChordsApp: App {
                 .background(Color(red: 18 / 255, green: 20 / 255, blue: 24 / 255))
                 .preferredColorScheme(.dark)
         }
-        .onChange(of: phase) { _, now in
+        .onChange(of: phase, initial: true) { _, now in
             // Never auto-lock while the app is in front: you're playing guitar, not touching the screen.
             UIApplication.shared.isIdleTimerDisabled = (now == .active)
         }

@@ -12,4 +12,6 @@ A personal backing-track app: pick a key, build a looping chord progression (ext
 4. On the iPhone, go to Settings → General → VPN & Device Management, open your Apple ID, and tap **Trust**. On iOS 16 and later, also turn on Settings → Privacy & Security → **Developer Mode** and restart.
 5. Free Apple IDs expire sideloaded apps after **7 days**. Re-run Sideloadly, or turn on its automatic refresh.
 
+**Keep your saved progressions:** always install the new `.ipa` *over* the existing app with the same Apple ID and the same bundle id (`com.habbi95.guitarchords`; don't let Sideloadly change it). Deleting the app, even an expired one, deletes everything you saved in it.
+
 Design docs: `docs/superpowers/specs/`.
