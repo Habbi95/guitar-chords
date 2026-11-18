@@ -10,7 +10,11 @@ const CHAR = { D: 'down', U: 'up', X: 'mute', B: 'bass', '.': 'rest' };
 
 export const nextStroke = (s) => STROKES[(STROKES.indexOf(s) + 1) % STROKES.length];
 
-export const newId = () => globalThis.crypto.randomUUID();
+let counter = 0;
+/** Unique id; randomUUID only exists on https/localhost, so fall back elsewhere. */
+export const newId = () => (typeof globalThis.crypto?.randomUUID === 'function'
+  ? globalThis.crypto.randomUUID()
+  : `id-${Date.now().toString(36)}-${(counter++).toString(36)}-${Math.random().toString(36).slice(2, 10)}`);
 
 /** @returns {Pattern} */
 export function parsePattern(name, grid, notation, id = newId()) {

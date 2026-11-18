@@ -4,6 +4,9 @@ import { LETTERS, parsePitch, pitchClass, pitchName, spell } from './pitch.js';
 /** @typedef {{tonic: Pitch, mode: 'major'|'minor'}} Key */
 
 export const ALL_TONICS = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+/** Minor keys as guitarists name them (C# minor, not Db minor). */
+export const MINOR_TONICS = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B'];
+export const tonicsFor = (mode) => (mode === 'minor' ? MINOR_TONICS : ALL_TONICS);
 const STEPS = { major: [2, 2, 1, 2, 2, 2, 1], minor: [2, 1, 2, 2, 1, 2, 2] };
 
 /** @returns {Key} */

@@ -6,6 +6,8 @@ import { TUNING, soundingStrings } from '../theory/voicer.js';
 export const SPREAD = 0.015;
 export const FADE = 0.005;
 export const MUTE_SPREAD = 0.005;
+/** Cache budget: total seconds of rendered audio kept (≈11 MB at 48 kHz). */
+export const MAX_CACHE_SECONDS = 60;
 const PEAK = 0.35;
 const UP_GAIN = 0.8;
 const ACCENT_GAIN = 2;
@@ -59,15 +61,20 @@ export function renderStrike(strike, sr) {
 export const strikeKey = (s) => `${s.voicing.frets.join(',')}|${s.stroke}|${s.accent ? 1 : 0}|${s.ring}`;
 
 export class RenderCache {
-  constructor(sr) { this.sr = sr; this.map = new Map(); }
-  /** @param {Strike} strike */
+  constructor(sr) { this.sr = sr; this.map = new Map(); this.totalFrames = 0; }
+  /** Least-recently-used cache bounded by total frames. @param {Strike} strike */
   get(strike) {
     const k = strikeKey(strike);
     let buf = this.map.get(k);
-    if (!buf) {
-      if (this.map.size > 400) this.map.clear();
-      buf = renderStrike(strike, this.sr);
-      this.map.set(k, buf);
+    if (buf) { this.map.delete(k); this.map.set(k, buf); return buf; }
+    buf = renderStrike(strike, this.sr);
+    this.map.set(k, buf);
+    this.totalFrames += buf.length;
+    const limit = MAX_CACHE_SECONDS * this.sr;
+    for (const [oldKey, old] of this.map) {
+      if (this.totalFrames <= limit || oldKey === k) break;
+      this.map.delete(oldKey);
+      this.totalFrames -= old.length;
     }
     return buf;
   }

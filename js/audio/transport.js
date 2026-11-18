@@ -14,6 +14,7 @@ export class Transport {
    * @param {(pos: {bar: number, step: number} | null) => void} onPlayhead
    */
   constructor(engine, getProgression, onPlayhead) {
+    this.starting = false;
     this.engine = engine;
     this.getProgression = getProgression;
     this.onPlayhead = onPlayhead;
@@ -25,13 +26,20 @@ export class Transport {
   }
 
   async play() {
-    if (this.isPlaying || !this.getProgression().bars.length) return;
-    await this.engine.unlock();
+    if (this.isPlaying || this.starting || !this.getProgression().bars.length) return;
+    this.starting = true;
+    try { await this.engine.unlock(); } finally { this.starting = false; }
+    if (this.isPlaying) return;
     const sr = this.engine.sampleRate;
     if (!this.cache || this.cache.sr !== sr) this.cache = new RenderCache(sr);
+    // Render the first bar before fixing its start time, so a slow first render can't make it late.
+    const p = this.getProgression();
+    if (!p.bars.length) return;
+    for (const s of planBar(0, p, sr)) this.cache.get(s);
     this.cursor = new PlaybackCursor(this.engine.nowFrame() + Math.round(START_DELAY * sr));
     this.isPlaying = true;
     this.tick();
+    if (this.timer) clearInterval(this.timer);
     this.timer = setInterval(() => this.tick(), TICK_MS);
     this.engine.requestWakeLock?.();
     this.loopPlayhead();

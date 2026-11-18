@@ -15,6 +15,16 @@ await page.goto(url);
 await page.evaluate(() => localStorage.clear());
 await page.reload();
 results.initial = await chords();
+
+// one tap on a tempo arrow changes the tempo by exactly 1, even after waiting
+const bpmNow = async () => Number(await page.$eval('.bpm b', (e) => e.textContent));
+const before = await bpmNow();
+await page.tap('.nudge[aria-label="Faster"]');
+await page.waitForTimeout(1200);
+results.tempoTapDelta = (await bpmNow()) - before;
+await page.click('.nudge[aria-label="Slower"]');
+await page.waitForTimeout(1200);
+results.tempoClickBack = (await bpmNow()) - before;
 if (shots) await page.screenshot({ path: `${shots}/1-main.png` });
 
 // fixed chord on bar 2 via Free tab
